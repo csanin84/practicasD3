@@ -33,13 +33,13 @@ function getPromedioAnualPais(datos) {
 // configuraciones de area para graficar
 function getContenedorChartConfig() {
   let width = 350;
-  let height = 400;
+  let height = 450;
 
   let margin = {
     top: 10,
     bottom: 50,
     left: 200,
-    right: 10,
+    right:50,
   };
   // le quitamos los margenes de arriba y abajo, para dar un espaceado
   let bodyHeight = height - margin.top - margin.bottom;
@@ -58,7 +58,11 @@ function getPromediosScales(datos, config) {
   let { bodyWidth, bodyHeight } = config;
   let maxPromedio = d3.max(datos, (d) => d.Promedio); // obtener el promedio maximo anual
 
-  let xScale = d3.scaleLinear().domain([0, maxPromedio]).range([0, bodyWidth]);
+  let xScale = d3
+    .scaleLinear()
+    .domain([0, maxPromedio])
+    .range([0, bodyWidth]);
+    
 
   let yScale = d3
     .scaleBand()
@@ -71,7 +75,7 @@ function getPromediosScales(datos, config) {
 
 // dibujar las barras
 function dibujarBarrasPromedioChart(datos, scales, config) {
-  let { margin, container } = config; // es lo mismo que: 'let margin = config.margin; let container = config.container'
+  let { width, height, margin, bodyHeight, bodyWidth, container } = config; // es lo mismo que: 'let margin = config.margin; let container = config.container'
   let { xScale, yScale } = scales;
   let body = container
     .append("g")
@@ -87,27 +91,51 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
     .attr("width", (d) => xScale(d.Promedio)) 
     .attr("fill", "#2a5599")
     .on("mouseover", function(){
-      this.style.fill = "red";
+      //this.style.fill = "blue";
     })
     .on("mouseout", function(){
-      this.style.fill = "blue";
+     // this.style.fill =  "#2a5599";
     });
+
+
+    // dibujar linea que se mueve entre las barras
+    let line = container.append("g")
+          .attr("transform", "translate(0,10)");
+        
+    line.append("line")
+      .attr("x1", 0)
+      .attr("x2", 0)
+      .attr("y1", margin.top)
+      .attr("y2",  bodyHeight)
+      .attr("stroke", "red")
+      .attr("stroke-width", "3px");
+
+  // crear evento que mueve la barra
+  container
+    .on("mousemove", function() {
+      let x = d3.mouse(this)[0];
+      let y = d3.event.y;
+      maxBarras = xScale(datos[0].Promedio) + margin.left;
+      if(x >= margin.left && x <= maxBarras) 
+        line.attr("transform", `translate(${x},${margin.top-5})`)  
+
+    });
+
+
 } // fin funcion
 
 // dibujar axes
 function dibujarAxesChart(datos, scales, config) {
   let { xScale, yScale } = scales;
   let { container, margin, height } = config;
-  let axisX = d3.axisBottom(xScale).ticks(5);
+  let axisX = d3.axisBottom(xScale).ticks(3);
 
   container
     .append("g")
     .style(
       "transform",
-      `translate(${margin.left}px, ${height - margin.bottom}px)`)     
+      `translate(${margin.left}px, ${height - margin.bottom}px)`)        
     .call(axisX);
-
-
 
   let axisY = d3.axisLeft(yScale);
 
