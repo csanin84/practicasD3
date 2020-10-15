@@ -46,7 +46,7 @@ function getContenedorChartConfig() {
   // le quitamos los margenes de izquierda y derecha, para dar un espaceado
   let bodyWidth = width - margin.left - margin.right;
 
-  //The container is the SVG where we will draw the chart. In our HTML is the svg ta with the id AirlinesChart
+  // escoger el contenedor donde se haran los gráficos
   let container = d3.select("#contenedor");
   container.attr("width", width).attr("height", height);
 
@@ -71,7 +71,7 @@ function getPromediosScales(datos, config) {
 
 // dibujar las barras
 function dibujarBarrasPromedioChart(datos, scales, config) {
-  let { margin, container } = config; // this is equivalent to 'let margin = config.margin; let container = config.container'
+  let { margin, container } = config; // es lo mismo que: 'let margin = config.margin; let container = config.container'
   let { xScale, yScale } = scales;
   let body = container
     .append("g")
@@ -84,7 +84,7 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
     .append("rect")
     .attr("height", yScale.bandwidth())
     .attr("y", (d) => yScale(d.Nombre))
-    .attr("width", (d) => xScale(d.Promedio)) //TODO: set the width of the bar to be proportional to the airline count using the xScale
+    .attr("width", (d) => xScale(d.Promedio)) 
     .attr("fill", "#2a5599")
     .on("mouseover", function(){
       this.style.fill = "red";
