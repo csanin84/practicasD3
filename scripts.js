@@ -33,13 +33,13 @@ function getPromedioAnualPais(datos) {
 // configuraciones de area para graficar
 function getContenedorChartConfig() {
   let width = 350;
-  let height = 450;
+  let height = 400;
 
   let margin = {
     top: 10,
     bottom: 50,
     left: 200,
-    right:50,
+    right: 10,
   };
   // le quitamos los margenes de arriba y abajo, para dar un espaceado
   let bodyHeight = height - margin.top - margin.bottom;
@@ -91,14 +91,15 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
     .attr("width", (d) => xScale(d.Promedio)) 
     .attr("fill", "#2a5599")
     .on("mouseover", function(){
-      //this.style.fill = "blue";
+      this.style.fill = "blue";
     })
     .on("mouseout", function(){
-     // this.style.fill =  "#2a5599";
-    });
+      this.style.fill =  "#2a5599";
+    })
+    .on("click", () => console.log("Hola"));
 
 
-    // dibujar linea que se mueve entre las barras
+   /*  // dibujar linea que se mueve entre las barras
     let line = container.append("g")
           .attr("transform", "translate(0,10)");
         
@@ -119,7 +120,7 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
       if(x >= margin.left && x <= maxBarras) 
         line.attr("transform", `translate(${x},${margin.top-5})`)  
 
-    });
+    }); */
 
 
 } // fin funcion
