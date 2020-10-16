@@ -32,14 +32,14 @@ function getPromedioAnualPais(datos) {
 
 // configuraciones de area para graficar
 function getContenedorChartConfig() {
-  let width = 350;
+  let width = 500;
   let height = 400;
 
   let margin = {
     top: 10,
     bottom: 50,
     left: 200,
-    right: 10,
+    right: 70,
   };
   // le quitamos los margenes de arriba y abajo, para dar un espaceado
   let bodyHeight = height - margin.top - margin.bottom;
@@ -58,11 +58,7 @@ function getPromediosScales(datos, config) {
   let { bodyWidth, bodyHeight } = config;
   let maxPromedio = d3.max(datos, (d) => d.Promedio); // obtener el promedio maximo anual
 
-  let xScale = d3
-    .scaleLinear()
-    .domain([0, maxPromedio])
-    .range([0, bodyWidth]);
-    
+  let xScale = d3.scaleLinear().domain([0, maxPromedio]).range([0, bodyWidth]);
 
   let yScale = d3
     .scaleBand()
@@ -88,18 +84,41 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
     .append("rect")
     .attr("height", yScale.bandwidth())
     .attr("y", (d) => yScale(d.Nombre))
-    .attr("width", (d) => xScale(d.Promedio)) 
+    .attr("width", (d) => xScale(d.Promedio))
     .attr("fill", "#2a5599")
-    .on("mouseover", function(){
-      this.style.fill = "blue";
+
+    .on("mouseover", function (d) {
+      this.style.fill = "orange";
+
+      d3.select(this)
+        .transition()
+        .duration(300)
+        .attr("height", yScale.bandwidth() + 5)
+        .attr("width", xScale(d.Promedio) + 5);
+
+      body
+        .append("text")
+        .attr("class", "valor")
+        .attr("x", xScale(d.Promedio) + 10) // establecer coordenada al final de la barra  + 10 px
+        .attr("y", yScale(d.Nombre) + yScale.bandwidth() / 2) // establecer coordenada en la mitad de barra
+        .attr("font-size", "12px") // establecer el tamaño de letra
+        .text(d.Promedio.toFixed(2) + " %"); // colocar el texto al final
     })
-    .on("mouseout", function(){
-      this.style.fill =  "#2a5599";
+    .on("mouseout", function (d) {
+      this.style.fill = "#2a5599";
+
+      // colocar barras del tamaño orignal
+      d3.select(this)
+        .transition()
+        .duration(400)
+        .attr("height", yScale.bandwidth())
+        .attr("width", xScale(d.Promedio));
+
+      d3.selectAll(".valor").remove();
     })
     .on("click", () => console.log("Hola"));
 
-
-   /*  // dibujar linea que se mueve entre las barras
+  /*  // dibujar linea que se mueve entre las barras
     let line = container.append("g")
           .attr("transform", "translate(0,10)");
         
@@ -121,8 +140,6 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
         line.attr("transform", `translate(${x},${margin.top-5})`)  
 
     }); */
-
-
 } // fin funcion
 
 // dibujar axes
@@ -135,14 +152,15 @@ function dibujarAxesChart(datos, scales, config) {
     .append("g")
     .style(
       "transform",
-      `translate(${margin.left}px, ${height - margin.bottom}px)`)        
+      `translate(${margin.left}px, ${height - margin.bottom}px)`
+    )
     .call(axisX);
 
   let axisY = d3.axisLeft(yScale);
 
   container
     .append("g")
-    .style("transform", `translate(${margin.left}px, ${margin.top}px)`)      
+    .style("transform", `translate(${margin.left}px, ${margin.top}px)`)
     .call(axisY);
 } // fin drawAxesAirlinesChart
 
