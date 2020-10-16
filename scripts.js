@@ -81,12 +81,8 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
 
   bars
     .enter()
-    .append("rect")
-    .attr("height", yScale.bandwidth())
-    .attr("y", (d) => yScale(d.Nombre))
-    .attr("width", (d) => xScale(d.Promedio))
-    .attr("fill", "#2a5599")
-
+    .append("rect") 
+    //eventos
     .on("mouseover", function (d) {
       this.style.fill = "orange";
 
@@ -106,7 +102,6 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
     })
     .on("mouseout", function (d) {
       this.style.fill = "#2a5599";
-
       // colocar barras del tamaño orignal
       d3.select(this)
         .transition()
@@ -116,7 +111,18 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
 
       d3.selectAll(".valor").remove();
     })
-    .on("click", () => console.log("Hola"));
+    .on("click", () => console.log("Hola"))
+    .attr("height", yScale.bandwidth()) 
+    .attr("y", (d) => yScale(d.Nombre))
+
+    // animacion en el width
+    .transition()
+    .ease(d3.easeSin)
+    .duration(2000)
+    .delay( d => Math.sqrt(d.Promedio))
+    
+    .attr("width", (d) => xScale(d.Promedio))
+    .attr("fill", "#2a5599") ;
 
   /*  // dibujar linea que se mueve entre las barras
     let line = container.append("g")
