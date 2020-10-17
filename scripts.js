@@ -75,7 +75,7 @@ function mostarTooltip(d, pos){
   d3.select(".tooltip_promedios")    
     .style("top", pos[1]+"px")
     .style("left", pos[0]+"px") 
-    .text(d.Promedio.toFixed(2) + " %")  
+    .text(d.Nombre +": " + d.Promedio.toFixed(2) + " %")  
     .style("display", "block");
 
 }// fin funcion mostrarTooltip
@@ -95,7 +95,7 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
     .append("rect") 
     //eventos
     .on("mouseenter", d => {
-      pos = [d3.event.pageX, d3.event.pageY];
+      pos = [d3.event.clientX, d3.event.clientY];
       mostarTooltip(d, pos);
     })
     .on("mouseleave", d => {
@@ -114,9 +114,7 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
     .delay( d => Math.sqrt(d.Promedio))
     
     .attr("width", (d) => xScale(d.Promedio))
-    .attr("fill", "#2a5599");
-
-    
+    .attr("fill", "#2a5599");    
 
  
 } // fin funcion
