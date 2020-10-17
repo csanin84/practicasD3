@@ -13,12 +13,40 @@ svg {
   border: 1px solid black;
 }
 
-.vistaPrincipal{
-    display: inline-block;
+
+
+.vistaPrincipal {
+    width: 100%;
 }
 
+
+
+.left {
+    padding-left: 10px;
+    padding-top: 10px;
+    margin-left: 57px;
+    float: left;
+    position: relative;
+    width: 45%;
+    border: steelblue solid 1px;
+    height: auto;
+}
+
+.right {
+    padding-top: 10px;
+    padding-left: 10px;
+    margin-left: 10px;
+    position: relative;
+    float: left;
+    width: 45%;
+    border: steelblue solid 1px;
+    height: auto;
+}
+
+
+
 #contenedor,
-#contenedor_detalle {
+#contenedor_detalle { 
   font-weight: 700;
   font-size: 20px;
 }
