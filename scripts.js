@@ -32,8 +32,8 @@ function getPromedioAnualPais(datos) {
 
 // configuraciones de area para graficar
 function getContenedorChartConfig() {
-  let width = 500;
-  let height = 400;
+  let width = 400;
+  let height = 300;
 
   let margin = {
     top: 10,
@@ -69,6 +69,17 @@ function getPromediosScales(datos, config) {
   return { xScale, yScale };
 } // fin getPromediosScales
 
+// funcion Mostrar tooltip
+function mostarTooltip(d, pos){
+  console.log(pos);
+  d3.select(".tooltip_promedios")    
+    .style("top", pos[1]+"px")
+    .style("left", pos[0]+"px") 
+    .text(d.Promedio.toFixed(2) + " %")  
+    .style("display", "block");
+
+}// fin funcion mostrarTooltip
+
 // dibujar las barras
 function dibujarBarrasPromedioChart(datos, scales, config) {
   let { width, height, margin, bodyHeight, bodyWidth, container } = config; // es lo mismo que: 'let margin = config.margin; let container = config.container'
@@ -83,38 +94,19 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
     .enter()
     .append("rect") 
     //eventos
-    .on("mouseover", function (d) {
-      this.style.fill = "orange";
-
-      d3.select(this)
-        .transition()
-        .duration(300)
-        .attr("height", yScale.bandwidth() + 5)
-        .attr("width", xScale(d.Promedio) + 5);
-
-      body
-        .append("text")
-        .attr("class", "valor")
-        .attr("x", xScale(d.Promedio) + 10) // establecer coordenada al final de la barra  + 10 px
-        .attr("y", yScale(d.Nombre) + yScale.bandwidth() / 2) // establecer coordenada en la mitad de barra
-        .attr("font-size", "12px") // establecer el tamaño de letra
-        .text(d.Promedio.toFixed(2) + " %"); // colocar el texto al final
+    .on("mouseenter", d => {
+      pos = [d3.event.pageX, d3.event.pageY];
+      mostarTooltip(d, pos);
     })
-    .on("mouseout", function (d) {
-      this.style.fill = "#2a5599";
-      // colocar barras del tamaño orignal
-      d3.select(this)
-        .transition()
-        .duration(400)
-        .attr("height", yScale.bandwidth())
-        .attr("width", xScale(d.Promedio));
-
-      d3.selectAll(".valor").remove();
+    .on("mouseleave", d => {
+      d3.select(".tooltip_promedios")
+        .style("display", "none");
     })
+    
     .on("click", () => console.log("Hola"))
+    
     .attr("height", yScale.bandwidth()) 
     .attr("y", (d) => yScale(d.Nombre))
-
     // animacion en el width
     .transition()
     .ease(d3.easeSin)
@@ -122,30 +114,11 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
     .delay( d => Math.sqrt(d.Promedio))
     
     .attr("width", (d) => xScale(d.Promedio))
-    .attr("fill", "#2a5599") ;
+    .attr("fill", "#2a5599");
 
-  /*  // dibujar linea que se mueve entre las barras
-    let line = container.append("g")
-          .attr("transform", "translate(0,10)");
-        
-    line.append("line")
-      .attr("x1", 0)
-      .attr("x2", 0)
-      .attr("y1", margin.top)
-      .attr("y2",  bodyHeight)
-      .attr("stroke", "red")
-      .attr("stroke-width", "3px");
+    
 
-  // crear evento que mueve la barra
-  container
-    .on("mousemove", function() {
-      let x = d3.mouse(this)[0];
-      let y = d3.event.y;
-      maxBarras = xScale(datos[0].Promedio) + margin.left;
-      if(x >= margin.left && x <= maxBarras) 
-        line.attr("transform", `translate(${x},${margin.top-5})`)  
-
-    }); */
+ 
 } // fin funcion
 
 // dibujar axes
