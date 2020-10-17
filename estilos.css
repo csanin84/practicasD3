@@ -1,9 +1,6 @@
 * {
   font-family: "Nunito", sans-serif;
-  
 }
-
-
 
 h1 {
   background-color: #2a5599;
@@ -16,16 +13,20 @@ svg {
   border: 1px solid black;
 }
 
+.vistaPrincipal{
+    display: inline-block;
+}
 
-#contenedor {
+#contenedor,
+#contenedor_detalle {
   font-weight: 700;
-  font-size: 20px; 
+  font-size: 20px;
 }
 
 .tooltip_promedios {
   font-size: 10px;
   position: absolute;
-  width:auto;  
+  width: auto;
   height: auto;
   padding: 10px;
   background-color: white;
@@ -36,7 +37,11 @@ svg {
   -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
   box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
   pointer-events: none;
+  opacity: 0.8;
   display: none;
 }
 
-
+.line{
+    fill: none;
+    stroke: #2a5599;
+}
