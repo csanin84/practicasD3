@@ -130,13 +130,14 @@ function dibujarTendenciaPais(datos, scales, config){
       .x(d => xScale(d.date))
       .y(d => yScale(d.valor));    
 
-    //Create line
+    //dibujar lineas
     body
       .append("path")
       .datum(datos)
       .attr("class", "line")
       .attr("d", line);
 
+    //dibujar circulos
     body
       .selectAll("circle")
       .data(datos)
@@ -146,6 +147,18 @@ function dibujarTendenciaPais(datos, scales, config){
       .attr("cx", d => xScale(d.date))
       .attr("cy", d => yScale(d.valor))
       .attr("fill", "red");
+   
+    // colocar texto a los circulos
+    body.selectAll(".text")
+      .data(datos)
+      .enter()
+      .append("text") 
+      .attr("class", "label") 
+      .attr("font-size", 11 + "px")
+      .attr("x", d => xScale(d.date))
+      .attr("y", d => yScale(d.valor))
+      .attr("dy", "-5")
+      .text(d => d.valor+"%");
 
 }// fin funcion  dibujarTendenciaPais
 
@@ -189,13 +202,12 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
         .attr("height", yScale.bandwidth())
         .attr("width", xScale(d.Promedio));
     })
-    .on("click", function(d) {  
-      //this.style.fill = "#556677";  
+    .on("click", function(d) {         
       paisSeleccionado = d.Nombre; 
       console.log(paisSeleccionado);
       let histPais = getHistorico(d);      
       dibujarTendencia(histPais);         
-    }).merge(bars)
+    })
 
     //pintar barras
     .attr("height", yScale.bandwidth())
@@ -250,7 +262,7 @@ function dibujarTendencia(datos){
   config.container.selectAll("*").remove();//borrar elementos del contenedor
   let scales = getHistoricoScales(datos, config);
   
-  d3.select("#detalle").text(paisSeleccionado); // cambiar titulo de detalle
+  d3.select("#detalle").text("% " + paisSeleccionado); // cambiar titulo de detalle
 
   dibujarAxesChart(datos, scales, config, 5);
   dibujarTendenciaPais(datos, scales, config);
