@@ -32,8 +32,8 @@ function getPromedioAnualPais(datos) {
 
 // configuraciones de area para graficar
 function getContenedorChartConfig() {
-  let width = 400;
-  let height = 300;
+  let width = 600;
+  let height = 500;
 
   let margin = {
     top: 10,
@@ -102,7 +102,25 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
       d3.select(".tooltip_promedios")
         .style("display", "none");
     })
-    
+    .on("mouseover", function (d) {
+      this.style.fill = "orange";
+
+      d3.select(this)
+        .transition()
+        .duration(300)
+        .attr("height", yScale.bandwidth() + 5)
+        .attr("width", xScale(d.Promedio) + 5);
+      
+    })
+    .on("mouseout", function (d) {
+      this.style.fill = "#2a5599";
+      // colocar barras del tamaño orignal
+      d3.select(this)
+        .transition()
+        .duration(400)
+        .attr("height", yScale.bandwidth())
+        .attr("width", xScale(d.Promedio));      
+    })
     .on("click", () => console.log("Hola"))
     
     .attr("height", yScale.bandwidth()) 
