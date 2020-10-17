@@ -137,6 +137,16 @@ function dibujarTendenciaPais(datos, scales, config){
       .attr("class", "line")
       .attr("d", line);
 
+    body
+      .selectAll("circle")
+      .data(datos)
+      .enter()      
+      .append("circle")
+      .attr("r", 3+"px")
+      .attr("cx", d => xScale(d.date))
+      .attr("cy", d => yScale(d.valor))
+      .attr("fill", "red");
+
 }// fin funcion  dibujarTendenciaPais
 
 // dibujar las barras
