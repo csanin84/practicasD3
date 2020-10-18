@@ -1,6 +1,9 @@
 // variable global con todos los datos con los datos de las rutas
 let datos = {};
 let paisSeleccionado;
+// para controlar la transision
+let contadorBarras = 0;
+let tiempoTransition = 800;
 
 // ubicación de fichero
 let path = "./datos/";
@@ -141,9 +144,9 @@ function dibujarTendenciaPais(datos, scales, config){
     body
       .selectAll("circle")
       .data(datos)
-      .enter()      
+      .enter()           
       .append("circle")
-      .attr("r", 3+"px")
+      .attr("r", 3 + "px")
       .attr("cx", d => xScale(d.date))
       .attr("cy", d => yScale(d.valor))
       .attr("fill", "red");
@@ -164,6 +167,10 @@ function dibujarTendenciaPais(datos, scales, config){
 
 // dibujar las barras
 function dibujarBarrasPromedioChart(datos, scales, config) {
+  contadorBarras += 1;
+  // solo hacer la trancisión la primera vez regulando el delay
+  if (contadorBarras>1){ tiempoTransition = 0; } 
+
   let { width, height, margin, bodyHeight, bodyWidth, container } = config; // es lo mismo que: 'let margin = config.margin; let container = config.container'
   let { xScale, yScale } = scales;
   let body = container
@@ -185,7 +192,9 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
       d3.select(".tooltip_promedios").style("display", "none");
     })
     .on("mouseover", function (d) {
-      this.style.fill = "orange";
+       
+      let color = (paisSeleccionado == d.Nombre ? "red": "orange");
+      this.style.fill = color;      
 
       d3.select(this)
         .transition()
@@ -193,8 +202,9 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
         .attr("height", yScale.bandwidth() + 5)
         .attr("width", xScale(d.Promedio) + 5);
     })
-    .on("mouseout", function (d) {
-      this.style.fill = "#2a5599";
+    .on("mouseout", function (d) {       
+      let color = (paisSeleccionado == d.Nombre ? "red": "#2a5599");
+      this.style.fill = color;
       // colocar barras del tamaño orignal
       d3.select(this)
         .transition()
@@ -202,11 +212,17 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
         .attr("height", yScale.bandwidth())
         .attr("width", xScale(d.Promedio));
     })
-    .on("click", function(d) {         
-      paisSeleccionado = d.Nombre; 
-      console.log(paisSeleccionado);
+    .on("click", function(d) {   
+      //
+      dibujarBarrasPromedioChart(datos, scales, config)   
+      paisSeleccionado = d.Nombre;      
+      
+      let color = (paisSeleccionado == d.Nombre ? "red": "#2a5599");
+      this.style.fill = color;   
+      
       let histPais = getHistorico(d);      
-      dibujarTendencia(histPais);         
+      dibujarTendencia(histPais);  
+           
     })
 
     //pintar barras
@@ -215,8 +231,8 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
     // animacion en el width
     .transition()
     .ease(d3.easeSin)
-    .duration(2000)
-    .delay((d) => Math.sqrt(d.Promedio))
+    .duration(tiempoTransition)
+    .delay(d => Math.sqrt(d.Promedio))
 
     .attr("width", (d) => xScale(d.Promedio))
     .attr("fill", "#2a5599");
