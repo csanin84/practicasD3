@@ -19,7 +19,6 @@ function cargarDatos() {
   });
 } // fin funcion cargarDatos
 
-
 /* ############################################# TRANSFORMACIONES ########################################## */
 // obtener el promedio anual por país
 function getPromedioAnualPais(datos) {
@@ -50,15 +49,23 @@ function getHistorico(pais) {
 
 /* ################################# CONFIGURACIONES AREA DE DIBUJO ################################# */
 // configuraciones de area para graficar
-function getContenedorChartConfig(contenedor, w=500, h=450, mTop=10, mBottom=50, mLeft=200,  mRight=70 ){
+function getContenedorChartConfig(
+  contenedor,
+  w = 500,
+  h = 450,
+  mTop = 10,
+  mBottom = 50,
+  mLeft = 200,
+  mRight = 70
+) {
   let width = w;
   let height = h;
 
   let margin = {
-    top:  mTop,
-    bottom:  mBottom,
-    left:  mLeft,
-    right:  mRight,
+    top: mTop,
+    bottom: mBottom,
+    left: mLeft,
+    right: mRight,
   };
   // le quitamos los margenes de arriba y abajo, para dar un espaceado
   let bodyHeight = height - margin.top - margin.bottom;
@@ -90,21 +97,22 @@ function getPromediosScales(datos, config) {
 } // fin getPromediosScales
 
 // obtener escalas historico de pais
-function getHistoricoScales(datos, config){
+function getHistoricoScales(datos, config) {
   let { bodyWidth, bodyHeight } = config;
-  let maxPromedio = d3.max(datos, d => d.valor); //obtener el valor maximo
+  let maxPromedio = d3.max(datos, (d) => d.valor); //obtener el valor maximo
 
-  let yScale = d3.scaleLinear()
-    .domain([0, maxPromedio+10])
-    .range( [bodyHeight, 0]);
-  
-    let xScale = d3.scaleTime()
-      .domain(d3.extent(datos, d => d.date))
-      .range([0, bodyWidth]);    
- 
+  let yScale = d3
+    .scaleLinear()
+    .domain([0, maxPromedio + 10])
+    .range([bodyHeight, 0]);
+
+  let xScale = d3
+    .scaleTime()
+    .domain(d3.extent(datos, (d) => d.date))
+    .range([0, bodyWidth]);
+
   return { xScale, yScale };
-
-}// fin getHitoricoScales
+} // fin getHitoricoScales
 
 /* ############################################# TOOLTIP ########################################## */
 // funcion Mostrar tooltip
@@ -118,58 +126,56 @@ function mostarTooltip(d, pos) {
 
 /* ############################################# FUNCIONES PARA DIBUJAR BARRAS ########################################## */
 // funcion dibujarTendenciaPais
-function dibujarTendenciaPais(datos, scales, config){
-
+function dibujarTendenciaPais(datos, scales, config) {
   let { width, height, margin, bodyHeight, bodyWidth, container } = config; // es lo mismo que: 'let margin = config.margin; let container = config.container'
   let { xScale, yScale } = scales;
-   
+
   let body = container
     .append("g")
     .style("transform", `translate(${margin.left}px, ${margin.top}px)`);
 
-    //Define line generator
-    var line = d3.line()
-      .defined(d =>  !!d.valor )
-      .x(d => xScale(d.date))
-      .y(d => yScale(d.valor));    
+  //Define line generator
+  var line = d3
+    .line()
+    .defined((d) => !!d.valor)
+    .x((d) => xScale(d.date))
+    .y((d) => yScale(d.valor));
 
-    //dibujar lineas
-    body
-      .append("path")
-      .datum(datos)
-      .attr("class", "line")
-      .attr("d", line);
+  //dibujar lineas
+  body.append("path").datum(datos).attr("class", "line").attr("d", line);
 
-    //dibujar circulos
-    body
-      .selectAll("circle")
-      .data(datos)
-      .enter()           
-      .append("circle")
-      .attr("r", 3 + "px")
-      .attr("cx", d => xScale(d.date))
-      .attr("cy", d => yScale(d.valor))
-      .attr("fill", "red");
-   
-    // colocar texto a los circulos
-    body.selectAll(".text")
-      .data(datos)
-      .enter()
-      .append("text") 
-      .attr("class", "label") 
-      .attr("font-size", 11 + "px")
-      .attr("x", d => xScale(d.date))
-      .attr("y", d => yScale(d.valor))
-      .attr("dy", "-5")
-      .text(d => d.valor+"%");
+  //dibujar circulos
+  body
+    .selectAll("circle")
+    .data(datos)
+    .enter()
+    .append("circle")
+    .attr("r", 3 + "px")
+    .attr("cx", (d) => xScale(d.date))
+    .attr("cy", (d) => yScale(d.valor))
+    .attr("fill", "red");
 
-}// fin funcion  dibujarTendenciaPais
+  // colocar texto a los circulos
+  body
+    .selectAll(".text")
+    .data(datos)
+    .enter()
+    .append("text")
+    .attr("class", "label")
+    .attr("font-size", 11 + "px")
+    .attr("x", (d) => xScale(d.date))
+    .attr("y", (d) => yScale(d.valor))
+    .attr("dy", "-5")
+    .text((d) => d.valor + "%");
+} // fin funcion  dibujarTendenciaPais
 
 // dibujar las barras
 function dibujarBarrasPromedioChart(datos, scales, config) {
   contadorBarras += 1;
   // solo hacer la trancisión la primera vez regulando el delay
-  if (contadorBarras>1){ tiempoTransition = 0; } 
+  if (contadorBarras > 1) {
+    tiempoTransition = 0;
+  }
 
   let { width, height, margin, bodyHeight, bodyWidth, container } = config; // es lo mismo que: 'let margin = config.margin; let container = config.container'
   let { xScale, yScale } = scales;
@@ -192,9 +198,8 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
       d3.select(".tooltip_promedios").style("display", "none");
     })
     .on("mouseover", function (d) {
-       
-      let color = (paisSeleccionado == d.Nombre ? "red": "orange");
-      this.style.fill = color;      
+      let color = paisSeleccionado == d.Nombre ? "red" : "orange";
+      this.style.fill = color;
 
       d3.select(this)
         .transition()
@@ -202,8 +207,8 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
         .attr("height", yScale.bandwidth() + 5)
         .attr("width", xScale(d.Promedio) + 5);
     })
-    .on("mouseout", function (d) {       
-      let color = (paisSeleccionado == d.Nombre ? "red": "#2a5599");
+    .on("mouseout", function (d) {
+      let color = paisSeleccionado == d.Nombre ? "red" : "#2a5599";
       this.style.fill = color;
       // colocar barras del tamaño orignal
       d3.select(this)
@@ -212,17 +217,16 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
         .attr("height", yScale.bandwidth())
         .attr("width", xScale(d.Promedio));
     })
-    .on("click", function(d) {   
+    .on("click", function (d) {
       //
-      dibujarBarrasPromedioChart(datos, scales, config)   
-      paisSeleccionado = d.Nombre;      
-      
-      let color = (paisSeleccionado == d.Nombre ? "red": "#2a5599");
-      this.style.fill = color;   
-      
-      let histPais = getHistorico(d);      
-      dibujarTendencia(histPais);  
-           
+      dibujarBarrasPromedioChart(datos, scales, config);
+      paisSeleccionado = d.Nombre;
+
+      let color = paisSeleccionado == d.Nombre ? "red" : "#2a5599";
+      this.style.fill = color;
+
+      let histPais = getHistorico(d);
+      dibujarTendencia(histPais);
     })
 
     //pintar barras
@@ -232,14 +236,14 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
     .transition()
     .ease(d3.easeSin)
     .duration(tiempoTransition)
-    .delay(d => Math.sqrt(d.Promedio))
+    .delay((d) => Math.sqrt(d.Promedio))
 
     .attr("width", (d) => xScale(d.Promedio))
     .attr("fill", "#2a5599");
 } // fin funcion
 
 /* ############################################# FUNCIONES PARA DIBUJAR AXES ############################################# */
-// dibujar axes 
+// dibujar axes
 function dibujarAxesChart(datos, scales, config, ticks) {
   let { xScale, yScale } = scales;
   let { container, margin, height } = config;
@@ -261,7 +265,6 @@ function dibujarAxesChart(datos, scales, config, ticks) {
     .call(axisY);
 } // fin drawAxesAirlinesChart
 
-
 /* ############################################# FUNCION DIBUJAR GRAFICOs PRINCIPALES########################################## */
 // Dibujar lineas
 function dibujarChart(datos) {
@@ -272,17 +275,24 @@ function dibujarChart(datos) {
 } // fin funcion dibujarChart
 
 // función dibujarTendencia
-function dibujarTendencia(datos){
-  
-  let config = getContenedorChartConfig("#contenedor_detalle",500, 450, 10, 50, 70,  70); 
-  config.container.selectAll("*").remove();//borrar elementos del contenedor
+function dibujarTendencia(datos) {
+  let config = getContenedorChartConfig(
+    "#contenedor_detalle",
+    500,
+    450,
+    10,
+    50,
+    70,
+    70
+  );
+  config.container.selectAll("*").remove(); //borrar elementos del contenedor
   let scales = getHistoricoScales(datos, config);
-  
+
   d3.select("#detalle").text("% " + paisSeleccionado); // cambiar titulo de detalle
 
   dibujarAxesChart(datos, scales, config, 5);
   dibujarTendenciaPais(datos, scales, config);
-}// fin funcion dibujar tendencia
+} // fin funcion dibujar tendencia
 
 /* ############################################# MOSTRAR RESULTADOS ########################################## */
 // Mostrar datos
