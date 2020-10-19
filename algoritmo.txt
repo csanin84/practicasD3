@@ -1,0 +1,98 @@
+
+Estructura de los Datos
+
+{
+    "Id": "05c820a8-8aa8-45d5-8440-131dfb1e9762",
+    "Url": "www.epdata.es/europa-estados-unidos-encabezan-penetracion-telefonia-movil-nivel-mundial/05c820a8-8aa8-45d5-8440-131dfb1e9762",
+    "Titulo": "Europa y Norteamérica encabezan la penetración de la telefonía móvil a nivel mundial",
+    "Subtitulo": "",
+    "Datos": {
+        "Metricas": [
+            {
+                "Id": 0,
+                "Nombre": "Mundo",
+                "SonDatosNumericos": true,
+                "Fuente": "GSMA",
+                "Clasificacion": null,
+                "Unidad": "Penetración (%)",
+                "Escala": "Unidades",
+                "EscalaFactorPotencia10": 0,
+                "Datos": [
+                    {
+                        "Agno": 2013,
+                        "Periodo": "Año",
+                        "Parametro": "2013",
+                        "Valor": 47,
+                        "Estado": null,
+                        "Notas": null
+                    }, ...
+                    {
+                        "Agno": 2018,
+                        "Periodo": "Año",
+                        "Parametro": "2018",
+                        "Valor": 70,
+                        "Estado": null,
+                        "Notas": null
+                    }                    
+                ]
+            }
+        ]
+    }
+}
+
+1.  primero se ejecuta:
+cargarDatos().then(mostrarDatos);
+el cual llama a la función cargarDatos, que carga los datos 
+en una variable global, y despues llama a funcion mostrarDatos
+que toma las dispociciones para mostrar los graficos viculados
+
+2. mostrarDatos():
+Esta función guarda los datos en una variable local para no dañar 
+los datos originales y trabajar en una copia.
+Después hace una transformación en los datos llamando a la función 
+getPromedioAnualPais(datos).
+
+3. getPromedioAnualPais(datos):
+esta funcion calcula el promedio porcentual anual por pais, para poder 
+realizar el gráfico de barras, y agrega un nuevo campo(key) llamado 
+promedio que contiene ese valor.
+
+4. dibujarChart(datos):
+Esta función establece los parametros de configuración del aréa de dibujo,
+escalas. Después dibuja las barras y los axes.
+
+Para esto usa las funciones:
+	getContenedorChartConfig(contenedor): 
+		tiene unos valores por defecto, que se pueden modificar en cada llamada. 
+		Devuelve un apuntador al contenedor, sus margenes y su tamaño.
+	
+	getPromediosScales(datos, config) => devuelve las escalas a usar para el grafico de barras.
+
+se procede a dibujar las barras y los axes:
+	dibujarBarrasPromedioChart(datos, scales, config);
+  	dibujarAxesChart(datos, scales, config, ticks);
+
+
+
+5. dibujarBarrasPromedioChart(datos, scales, config):
+Esta función grafica las barras y las animaciones, valiendose de eventos y transitions.
+el evento onClick es el encargado de hacer el vinculo con la segunda gráfica, mediante la función
+dibujarTendencia(datos).
+
+6.  dibujarTendencia(datos): 
+Esta función establece los parametros de configuración del aréa de dibujo,
+escalas. Después dibuja las barras y los axes.
+Para esto usa las funciones:
+	getContenedorChartConfig(contenedor): 
+		tiene unos valores por defecto, que se pueden modificar en cada llamada. 
+		Devuelve un apuntador al contenedor, sus margenes y su tamaño.
+	
+	getHistoricoScales(datos, config) => devuelve las escalas a usar para el grafico de barras.
+
+
+se procede a dibujar las tendencias y los axes:
+	dibujarAxesChart(datos, scales, config, ticks);
+	dibujarTendenciaPais(datos, scales, config);
+
+
+

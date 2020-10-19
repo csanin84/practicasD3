@@ -1,14 +1,16 @@
-// variable global con todos los datos con los datos de las rutas
-let datos = {};
-let paisSeleccionado;
+// Variables globales
+let datos = {}; // variable global con todos los datos por pais y año
+let paisSeleccionado; // pais selecionado para mostrar detalle
+
 // para controlar la transision
-let contadorBarras = 0;
-let tiempoTransition = 800;
+let contadorBarras = 0; // numero de veces que se esjecuta la funcion para graficar las barras
+let tiempoTransition = 800; // tempo que se le da al delay en la transición
 
 // ubicación de fichero
 let path = "./datos/";
 let name = "europa_y_norteamerica_enc.json";
 let url = path + name;
+
 
 // cargar datos en la variable global "datos"
 function cargarDatos() {
@@ -104,7 +106,7 @@ function getHistoricoScales(datos, config) {
   let yScale = d3
     .scaleLinear()
     .domain([0, maxPromedio + 10])
-    .range([bodyHeight, 0]);
+    .range([bodyHeight, 0]); // invertir para graficar bien
 
   let xScale = d3
     .scaleTime()
@@ -124,7 +126,7 @@ function mostarTooltip(d, pos) {
     .style("display", "block");
 } // fin funcion mostrarTooltip
 
-/* ############################################# FUNCIONES PARA DIBUJAR BARRAS ########################################## */
+/* ############################################# FUNCIONES PARA DIBUJAR BARRAS Y TENDENCIA ########################################## */
 // funcion dibujarTendenciaPais
 function dibujarTendenciaPais(datos, scales, config) {
   let { width, height, margin, bodyHeight, bodyWidth, container } = config; // es lo mismo que: 'let margin = config.margin; let container = config.container'
@@ -142,17 +144,23 @@ function dibujarTendenciaPais(datos, scales, config) {
     .y((d) => yScale(d.valor));
 
   //dibujar lineas
-  body.append("path").datum(datos).attr("class", "line").attr("d", line);
+  body
+  .append("path")
+  .datum(datos)
+  .attr("class", "line")
+  .attr("d", line);
 
   //dibujar circulos
   body
     .selectAll("circle")
     .data(datos)
     .enter()
+    // animacion en el fill
     .append("circle")
+
     .attr("r", 3 + "px")
     .attr("cx", (d) => xScale(d.date))
-    .attr("cy", (d) => yScale(d.valor))
+    .attr("cy", (d) => yScale(d.valor))  
     .attr("fill", "red");
 
   // colocar texto a los circulos
@@ -171,7 +179,7 @@ function dibujarTendenciaPais(datos, scales, config) {
 
 // dibujar las barras
 function dibujarBarrasPromedioChart(datos, scales, config) {
-  contadorBarras += 1;
+  contadorBarras += 1; // contar numero de veces que se llama a la función
   // solo hacer la trancisión la primera vez regulando el delay
   if (contadorBarras > 1) {
     tiempoTransition = 0;
@@ -191,13 +199,16 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
 
     //eventos
     .on("mouseenter", (d) => {
+      // mostrar tooltip al entrar en la barra
       pos = [d3.event.clientX, d3.event.clientY];
       mostarTooltip(d, pos);
     })
     .on("mouseleave", (d) => {
+      //ocultar tooltip al salir de la barra
       d3.select(".tooltip_promedios").style("display", "none");
     })
     .on("mouseover", function (d) {
+      // colocar en naranja al salir si el pais no es el seleccionado
       let color = paisSeleccionado == d.Nombre ? "red" : "orange";
       this.style.fill = color;
 
@@ -208,6 +219,7 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
         .attr("width", xScale(d.Promedio) + 5);
     })
     .on("mouseout", function (d) {
+      // colocar en azul si el pais no es el seleciionado
       let color = paisSeleccionado == d.Nombre ? "red" : "#2a5599";
       this.style.fill = color;
       // colocar barras del tamaño orignal
@@ -218,14 +230,18 @@ function dibujarBarrasPromedioChart(datos, scales, config) {
         .attr("width", xScale(d.Promedio));
     })
     .on("click", function (d) {
-      //
+      // redibujar el grafico
       dibujarBarrasPromedioChart(datos, scales, config);
+      // seleccionar pais en variable global
       paisSeleccionado = d.Nombre;
 
+      //colocar pais selecionado en rojo
       let color = paisSeleccionado == d.Nombre ? "red" : "#2a5599";
       this.style.fill = color;
 
+      // obtener historico del pais
       let histPais = getHistorico(d);
+      // dibujar el historico del pais(tendencia)
       dibujarTendencia(histPais);
     })
 
@@ -265,7 +281,7 @@ function dibujarAxesChart(datos, scales, config, ticks) {
     .call(axisY);
 } // fin drawAxesAirlinesChart
 
-/* ############################################# FUNCION DIBUJAR GRAFICOs PRINCIPALES########################################## */
+/* ############################################# FUNCION PARA LLAMAR GRAFICOS ########################################## */
 // Dibujar lineas
 function dibujarChart(datos) {
   let config = getContenedorChartConfig("#contenedor");
@@ -299,13 +315,14 @@ function dibujarTendencia(datos) {
 function mostrarDatos() {
   //Obtener los datos del dataset
   let penetracion = datos.penetracion;
-  // mostrar en consola
-  //console.log(penetracion);
 
   // calcular promedio de penetración anual
   penetracion = getPromedioAnualPais(penetracion);
 
+  // dibujar garaficos
   dibujarChart(penetracion);
 } // fin mostrarDatos
 
+// Primera llamada  carga los datos de manera global
+// y muestra el grafico de barras.
 cargarDatos().then(mostrarDatos);
